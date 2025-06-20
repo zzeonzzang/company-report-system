@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업종합레포트 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+        }
+
+        .input-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .report-container {
+            display: none;
+        }
+
+        .report-section {
+            background: white;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .news-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-description {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-date {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>기업종합레포트 시스템</h1>
+            <p>기업명을 입력하여 종합적인 기업 정보를 확인하세요</p>
+        </header>
+
+        <div class="input-section">
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="companyName">기업명</label>
+                    <input type="text" id="companyName" name="companyName" placeholder="예: 삼성전자" required>
+                </div>
+                <div class="form-group">
+                    <label for="stockCode">종목코드 (선택사항)</label>
+                    <input type="text" id="stockCode" name="stockCode" placeholder="예: 005930">
+                </div>
+                <button type="submit">레포트 생성</button>
+                <button type="button" id="testBtn" style="margin-left: 10px; background: #28a745;">연결 테스트</button>
+            </form>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                </div>
+                <h3 style="text-align: center; color: #667eea; margin-bottom: 1rem;">레포트 생성 중...</h3>
+                <div style="text-align: center; color: #666; line-height: 1.6;">
+                    <p>✅ DART API에서 재무정보 조회 중...</p>
+                    <p>✅ 네이버에서 주가정보 수집 중...</p>
+                    <p>✅ 최신 뉴스 분석 중...</p>
+                    <p>🤖 AI 예측 모델 실행 중...</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: #999;">
+                        보통 10-30초 정도 소요됩니다. 잠시만 기다려주세요.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        </style>
+
+        <div id="reportContainer" class="report-container">
+            <div class="report-section">
+                <div class="section-header">기업 기본정보</div>
+                <div class="section-content" id="basicInfo">
+                </div>
+            </div>
+
+            <div class="report-section">
+                <div class="section-header">채용정보</div>
+                <div class="section-content" id="jobInfo">
+                </div>
+            </div>
+
+            <div class="report-section">
+                <div class="section-header">재무정보</div>
+                <div class="section-content" id="financialInfo">
+                </div>
+            </div>
+
+            <div class="report-section">
+                <div class="section-header">주가정보</div>
+                <div class="section-content" id="stockInfo">
+                </div>
+            </div>
+
+            <div class="report-section">
+                <div class="section-header">뉴스 및 언론보도</div>
+                <div class="section-content" id="newsInfo">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
